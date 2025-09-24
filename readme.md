@@ -8,11 +8,13 @@ Why reinvent the wheel when you can reinvent the wrench that builds the wheel?
 
 ## WTF?
 
-NOG is a build system written in `build.go` and `nog.go` define your build commands and whatever else you need.
+NOG is a build system that depends on 3 things
 
-Use the go's excellent stdlib to do shit you can only dream in Make.
+1. Go toolchain -> Use the go's excellent stdlib and do shit you can only dream in Make
+2. `build.go` -> the main file write your build commands as go a program
+3. `nog.go` -> Contains the `GoRebuildUrSelf` Technology and other useful functions to use in your cmds
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Step 1: Create your `build.go`
 
