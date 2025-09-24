@@ -19,12 +19,16 @@ Use the go's excellent stdlib to do shit you can only dream in Make.
 ```go
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os/exec"
+)
 
 func main() {
-	GoRebuildUrself() // The magic happens here ✨
-	fmt.Println("How's your noggin?")
-    
+	GoRebuildUrself()
+
+	fmt.Println("Cutting edge build system")
+	exec.Command("")
 	// Add your actual build logic here
 }
 ```

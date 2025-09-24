@@ -146,6 +146,9 @@ func BuildExec(executablePath string) {
 
 func RunCmd(cmd ...string) {
 	execCmd := exec.Command(cmd[0], cmd[1:]...)
+	execCmd.Stdout = os.Stdout
+	execCmd.Stderr = os.Stderr
+	execCmd.Stdin = os.Stdin
 	err := execCmd.Run()
 	if err != nil {
 		Fatal("Unable to run command: %v, %v", cmd, err)
