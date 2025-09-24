@@ -112,12 +112,10 @@ func BuildExec(executablePath string) {
 		NogFile,
 		BuildFile,
 	}
-	RunCmd(cmd...)
+	RunCmd(cmd[0], cmd[1:]...)
 
 	slog.Info("Calling new executable", "path", executablePath)
-	newCmd := []string{executablePath}
-	newCmd = append(newCmd, os.Args[1:]...)
-	RunCmd(newCmd...)
+	RunCmd(executablePath, os.Args[1:]...)
 
 	removeOldExec(executablePath)
 
@@ -133,15 +131,15 @@ func removeOldExec(executablePath string) {
 	}
 }
 
-func RunCmd(cmd ...string) {
-	execCmd := exec.Command(cmd[0], cmd[1:]...)
+func RunCmd(executable string, args ...string) {
+	execCmd := exec.Command(executable, args...)
 	execCmd.Stdout = os.Stdout
 	execCmd.Stderr = os.Stderr
 	execCmd.Stdin = os.Stdin
 
 	err := execCmd.Run()
 	if err != nil {
-		Fatal("Unable to run command: %v, %v", cmd, err)
+		Fatal("Unable to run command: %v, %v", args, err)
 	}
 }
 
