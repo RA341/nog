@@ -27,9 +27,7 @@ import (
 func main() {
 	GoRebuildUrself()
 
-	fmt.Println("Cutting edge build system")
-	exec.Command("")
-	// Add your actual build logic here
+	RunCmd("go", "build", "urmom")
 }
 ```
 

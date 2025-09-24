@@ -13,5 +13,5 @@ func main() {
 	slog.SetLogLoggerLevel(10)
 	GoRebuildUrself()
 
-	Lol()
+	RunCmd("go", "build", "urmom")
 }
