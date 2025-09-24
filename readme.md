@@ -80,10 +80,6 @@ A: Yes.
 ## Contributing
 
 Found a bug? Want to make NOG even more unnecessarily complex? PRs welcome!
-
-Just remember: We're not trying to replace Make, Ninja, Bazel, or any other perfectly good build system. We're here to
-have fun and maybe learn something along the way.
-
 ## 📄 License
 
 This project is licensed under the [GPLv3](LICENSE)
