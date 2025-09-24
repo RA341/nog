@@ -24,7 +24,7 @@ const (
 
 var (
 	exe        = ""
-	NogExecOld = NogExec + ".old"
+	NogExecOld = NogExec + ".old" + exe
 )
 
 func Exe() {
@@ -45,7 +45,9 @@ func MustStat(path string) os.FileInfo {
 	return info
 }
 
-func GoRebuildUrself() {
+func GoRebuildUrself(opts ...Opt) {
+	parseOpts(opts...)
+
 	if len(os.Args) > 1 && os.Args[1] == cleanArg {
 		cleanupAfterUrSelf()
 		os.Exit(0)
@@ -60,6 +62,33 @@ func GoRebuildUrself() {
 		slog.Info("up to date")
 	}
 }
+
+type RebuildOpts struct {
+	// set working dir to look for build.go and nob.go
+	workingDir string
+}
+
+var rebuildOptions RebuildOpts
+
+func parseOpts(opts ...Opt) {
+	finalOpts := RebuildOpts{}
+	for _, opt := range opts {
+		opt(&finalOpts)
+	}
+	if finalOpts.workingDir == "" {
+		finalOpts.workingDir = "./"
+	}
+
+	rebuildOptions = finalOpts
+}
+
+func WithWD(path string) Opt {
+	return func(opts *RebuildOpts) {
+		opts.workingDir = path
+	}
+}
+
+type Opt func(opts *RebuildOpts)
 
 func shouldRebuild(executablePath string) bool {
 	execStat, err := os.Stat(executablePath)
@@ -76,8 +105,9 @@ func shouldRebuild(executablePath string) bool {
 }
 
 func cleanupAfterUrSelf() {
-	slog.Info("Cleaning up after MySelf")
-	err := os.RemoveAll("./" + NogExecOld + exe)
+	path := getOldExecName()
+	slog.Info("Cleaning up after MySelf", "path", path)
+	err := os.RemoveAll(path)
 	if err != nil {
 		slog.Error("Failed to remove old executable: %v", err)
 		return
@@ -85,12 +115,11 @@ func cleanupAfterUrSelf() {
 }
 
 func GetExecutable() string {
-	executablePath := "./" + NogExec + "" + exe
-	return executablePath
+	return rebuildOptions.workingDir + NogExec + "" + exe
 }
 
 func BuildExec(executablePath string) {
-	rename := "./" + NogExecOld + exe
+	rename := getOldExecName()
 
 	slog.Info("Renaming old build exec",
 		"from", executablePath,
@@ -117,17 +146,27 @@ func BuildExec(executablePath string) {
 	slog.Info("Calling new executable", "path", executablePath)
 	RunCmd(executablePath, os.Args[1:]...)
 
-	removeOldExec(executablePath)
+	slog.Debug("Removing old exec")
 
 	slog.Info("Goodbye...")
+	// call the new binary to remove the old binary
+	// calls ./nog --clean
+	StartCmdSilent(executablePath, cleanArg)
+
 	os.Exit(0)
 }
 
-func removeOldExec(executablePath string) {
-	// remove old executable in the background
-	newCmdS := exec.Command(executablePath, cleanArg)
-	if err := newCmdS.Start(); err != nil {
-		slog.Error("Failed to start new executablePath: %v", err)
+func getOldExecName() string {
+	return rebuildOptions.workingDir + NogExecOld + exe
+}
+
+// StartCmdSilent runs exec.Run() with no attached streams
+func StartCmdSilent(executable string, args ...string) {
+	execCmd := exec.Command(executable, args...)
+
+	err := execCmd.Start()
+	if err != nil {
+		Fatal("Unable to run cmd: %v, %v", args, err)
 	}
 }
 
@@ -139,7 +178,7 @@ func RunCmd(executable string, args ...string) {
 
 	err := execCmd.Run()
 	if err != nil {
-		Fatal("Unable to run command: %v, %v", args, err)
+		Fatal("Unable to run cmd: %v, %v", args, err)
 	}
 }
 
