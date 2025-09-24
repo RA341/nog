@@ -2,12 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 	"os"
 	"os/exec"
 	"runtime"
-	"syscall"
 )
 
 func init() {
@@ -110,8 +108,8 @@ func BuildExec(executablePath string) {
 		"go",
 		"build",
 		"-o", executablePath,
-		"nog.go",
-		"build.go",
+		NogFile,
+		BuildFile,
 	}
 	RunCmd(cmd...)
 
@@ -130,12 +128,6 @@ func BuildExec(executablePath string) {
 
 	// remove old executable in the background
 	newCmdS := exec.Command(executablePath, cleanArg)
-	newCmdS.SysProcAttr = &syscall.SysProcAttr{CmdLine: fmt.Sprintf(
-		`"%s" %s`,
-		executablePath,
-		cleanArg,
-	)}
-
 	if err = newCmdS.Start(); err != nil {
 		slog.Error("Failed to start new executablePath: %v", err)
 	}
