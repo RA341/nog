@@ -82,5 +82,4 @@ have fun and maybe learn something along the way.
 
 ## 📄 License
 
-This project is licensed under the "Do Whatever You Want But Don't Blame Us" license. Use at your own risk and
-existential peril.
+This project is licensed under the [GPLv3](LICENSE)
